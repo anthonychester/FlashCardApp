@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, Alert} from 'react-native';
+import {Button, Alert, TouchableHighlight} from 'react-native';
 import Animated, {useSharedValue, useAnimatedStyle, interpolate, withTiming} from 'react-native-reanimated';
 
 import {
@@ -36,7 +36,9 @@ function FlashCard(props: any) {
 
           console.log(makeMarkdown(props.front));
         return(
+          <TouchableHighlight onPress={props.onclick} underlayColor="none">
             <View style={styles.main}>
+                
                 <Animated.View style={[styles.front, frontAnimatedStyle]}>
 	                {makeMarkdown(props.front)}
                 </Animated.View>
@@ -46,6 +48,7 @@ function FlashCard(props: any) {
                 </Animated.View>
                 
             </View>
+            </TouchableHighlight>
         );//<Button title="FLIP" onPress={() => (spin.value = spin.value ? 0 : 1)}/>
 }
 

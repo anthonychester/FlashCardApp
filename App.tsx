@@ -5,45 +5,78 @@
  * @format
  */
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import React, {useState} from 'react';
+import { useColorScheme, Alert, BackHandler} from 'react-native';
 
-import FlashCard from './components/FlashCard';
-import NavBar from './components/NavBar';
-import FileNav from './components/FileNav';
+import Home from './components/pages/home'
+import Loading from './components/loading'
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import DocumentPicker from 'react-native-document-picker';
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
 
-  return (
-    <View style={styles.Home}>
-      <NavBar />
-      <View style={styles.NewCardHolder}>
-        <FlashCard front="&new_icon& **New Set**"/>
-      </View>
-      <FileNav />
-    </View>
-  );
+  const [folderURI, setFolderURI] = useState('');
+
+  AsyncStorage.getItem("folder-uri")
+  .then((furi)=> {
+    //console.log(furi);
+    if(furi || folderURI) {
+      //console.log("found");
+      //setFolderURI
+    } else {
+      //console.log("not found");
+      DocumentPicker.pickDirectory().then((uri) => {
+        //console.log(data.uri);
+        //add to AsyncStorage
+        if(uri && uri.uri) {
+           //decodeURIComponent
+          let loc = decodeURIComponent(JSON.stringify(uri.uri));
+          let s = loc.indexOf(":");
+          loc = loc.slice(s+1);
+          s = loc.indexOf(":");
+          loc = loc.slice(s+1);
+
+          setFolderURI(loc.slice(0, loc.length-1));
+        } else {
+          error('Local Data Not Found');
+        }
+      });
+    }
+  })
+  .catch((e) => {
+    error('Local Data Not Found');
+  });
+
+  if(folderURI) {
+    return (
+      <Home uri={folderURI}/>
+    );
+  } else {
+    return (
+      <Loading />
+    );
+  }
 }
 
-const styles = StyleSheet.create({
-  NewCardHolder: {
-    justifyContent: 'center', 
-    alignItems: 'center'
-  },
-  Home: {
-    backgroundColor: "#232020",
-    height: "100%"
-  }
-});
+function error(mes: string) {
+  Alert.alert('Error', mes, [
+    {
+      text: 'OK',
+      onPress: () => BackHandler.exitApp()
+    }
+  ]);
+}
 
 export default App;
+
+/*
+const storeData = async (value) => {
+  try {
+    await AsyncStorage.setItem('my-key', value);
+  } catch (e) {
+    // saving error
+  }
+};
+*/
