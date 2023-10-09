@@ -5,6 +5,7 @@ import {
   ScrollView,
   TouchableHighlight,
   PermissionsAndroid,
+  RefreshControl,
 } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -28,19 +29,18 @@ interface headers {
   group3: number;
   group2: number;
   group1: number;
+  path: string;
 }
 
 function FileNav(props: any) {
   const [setData, setSetData] = useState([{}]);
   const [sets, setSets] = useState(false);
-  const [dataReady, setDataReady] = useState(false);
+  //const [dataReady, setDataReady] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    
-
-        RNFS.mkdir(RNFS.DocumentDirectoryPath + "/Sets")
-        .then( () => {
-        RNFS.readDir(RNFS.DocumentDirectoryPath + "/Sets") // On Android, use "RNFS.DocumentDirectoryPath" (MainBundlePath is not defined)
+  function refreshSets() {
+    setRefreshing(true);
+  RNFS.readDir(RNFS.DocumentDirectoryPath + "/Sets") // On Android, use "RNFS.DocumentDirectoryPath" (MainBundlePath is not defined)
           .then(result => {
             //console.log('GOT RESULT', result);
             //setSetData([{name: 'test', cards: 5, due: 7}]);
@@ -50,39 +50,54 @@ function FileNav(props: any) {
             //let set_data: any[] = [];
 
             for(let f in result) {
-              console.log(f);
+              //console.log("f", f);
               //is file and .markdown cardset
               let res = result[f];
               if (res.isFile() && res.name.indexOf(".mdcs")) {
                   RNFS.read(res.path, 90, 0, "utf8").then((str) => {
-                    //console.log(str);
+                      //console.log(str);
                       let file_data = getHeaderData(str);
-                      let set_data = {name: file_data.name, cards: file_data.count, due: file_data.group1};
+                      file_data.path = res.path;
                       if(!sets) {
-                        setSetData([set_data]);
-                      } else {
-                        setSetData(setData.concat(set_data));
+                        setSetData([file_data]);
+                      } else { //use hashmap to prevent dups
+                        setSetData(setData.concat(file_data));
                       }
-                      setSets(makeFileElem(setData));
-                      setDataReady(true);
+                      setSets(makeFileElem(setData, props.setScreen));
                       //console.log(set_data);
+                      //setDataReady(true);
                   }).catch((err) => {
                     console.log(err.message);
                   });
               }
             }
-
+            setRefreshing(false);
           })
           .catch(err => {
-            //console.log(err.message, +':', err.code);
+            console.log("error");
+            console.log(err.message + ':', err.code);
+            setRefreshing(false);
           });
+}
+  useEffect(() => {
+        RNFS.mkdir(RNFS.DocumentDirectoryPath + "/Sets")
+        .then( () => {
+          refreshSets();
         })
+        .catch(err => {
+          console.log("error");
+          console.log(err.message +':', err.code);
+        });
   }, []);
-
-  if (!dataReady) {
+  if (false) {
+    //refreshSets();
     return <Loading />;
   } else {
-    return <ScrollView style={style.main}>{sets}</ScrollView>;
+    return (
+    <ScrollView style={style.main} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refreshSets} />}>
+        {sets} 
+    </ScrollView>
+        );
   }
 }
 
@@ -90,7 +105,9 @@ function File(props: any) {
   return (
     <TouchableHighlight
       onPress={() => {
-        console.log('fffff');
+        console.log('edit file: ' + props.data);
+        props.setScreen("Edit", props.data);
+
       }}
       underlayColor="none">
       <View style={style.fileMain}>
@@ -101,15 +118,16 @@ function File(props: any) {
     </TouchableHighlight>
   );
 }
-//{name: "test", cards: 5, due: 7}
-function makeFileElem(setData: any[]): any {
-  //console.log(setData);
+function makeFileElem(setData: any[], setScreen: any): any {
   let files: any[] = [];
   for (let i = 0; i < setData.length; i++) {
     let data = setData[i];
+    //console.log(data.name);
+    if(data.name) {
     files.push(
-      <File name={data.name} numCards={data.cards} due={data.due} key={i} />,
+      <File name={data.name} numCards={data.count} due={data.group1} data={data} key={i} setScreen={setScreen}/>,
     );
+    }
   }
   return files;
 }
@@ -150,8 +168,11 @@ function getHeaderData(str: string): headers {
   group4: Number(done[2]),
   group3: Number(done[3]),
   group2: Number(done[4]),
-  group1: Number(done[5])
+  group1: Number(done[5]),
+  path: ""
   };
 }
 
 export default FileNav;
+
+

@@ -20,6 +20,7 @@ import RNFS from 'react-native-fs';
 const BLANK = "\u001F"; //INFORMATION SEPARATOR ONE
 
 function Home(props: any): JSX.Element {
+
   const isDarkMode = useColorScheme() === 'dark';
     return (
     <View style={styles.Home}>
@@ -27,7 +28,7 @@ function Home(props: any): JSX.Element {
       <View style={styles.NewCardHolder}>
         <FlashCard front="&new_icon& **New Set**" onclick={() => {newSet()}}/>
       </View>
-      <FileNav/>
+      <FileNav setScreen={props.setScreen}/>
     </View>
   );
 }
@@ -53,7 +54,7 @@ function newSet() {
   //console.log("-----------\n"+file_cont+"-----------\n", file_cont.length);
 
   let d = new Date();
-  let path = RNFS.DocumentDirectoryPath + "/Sets/" + d.toISOString() + ".mdcs";
+  let path = RNFS.DocumentDirectoryPath + "/Sets/" + d.toISOString().replace(".", "-") + ".mdcs";
   RNFS.writeFile(path.replaceAll(":","-"), file_cont, 'utf8')
     .then((success) => {
       //console.log('FILE WRITTEN!');

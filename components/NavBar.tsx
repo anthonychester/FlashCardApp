@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef, useEffect} from 'react';
 import {Button, Alert, TextInput} from 'react-native';
 import Animated, {useSharedValue, useAnimatedStyle, interpolate, withTiming} from 'react-native-reanimated';
 
@@ -6,10 +6,43 @@ import {
     StyleSheet,
     Text,
     View,
+    Image,
+    TouchableHighlight
   } from 'react-native';
 
 function NavBar(props: any) {
+    const didMountRef = useRef(false)
     const [term, onChangeTerm] = React.useState('');
+    if(props.type == "edit") {
+        //onChangeTerm(props.title);
+        
+        useEffect(() => {
+            if (!didMountRef.current) {
+                console.log("ffff");
+                onChangeTerm(props.title);
+                didMountRef.current = true;
+              }
+        });
+
+        /*
+         
+         */
+        return(
+            <View style={style.Background}>
+            <TouchableHighlight style={style.to} onPress={props.onExit}>
+                <Image source={require('../assests/back.png')} style={style.back}/>
+            </TouchableHighlight>
+            <TextInput
+                onChangeText={(n) => {
+                    onChangeTerm(n);
+                    props.change(n);
+                }}
+                style={style.title}
+                value={term}
+            />
+            </View>
+        );
+    } else {
     return(
         <View style={style.Background}>
              <TextInput
@@ -20,13 +53,16 @@ function NavBar(props: any) {
             />
         </View>
     );
+    }
 }
 
 const style = StyleSheet.create({
     Background: {
         height: 60,
-        width: 360,
+        width: "100%",
         backgroundColor: "#48D346",
+        flexDirection: 'row',
+        justifyContent: 'space-between',
     },
     input: {
         height: 40,
@@ -36,6 +72,21 @@ const style = StyleSheet.create({
         backgroundColor: "#D9D9D9",
         borderRadius: 12,
       },
+      title: {
+        color: "white",
+        fontSize: 25,
+        textAlign: "center",
+        paddingLeft: "20%"
+      },
+      to: {
+        width: 30,
+        height: 30,
+        paddingLeft: 10
+      },
+      back: {
+        width: 40,
+        height: 60,
+      }
 });
 
 export default NavBar;
