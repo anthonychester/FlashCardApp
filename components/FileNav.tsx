@@ -7,12 +7,6 @@ import {
   PermissionsAndroid,
   RefreshControl,
 } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  interpolate,
-  withTiming,
-} from 'react-native-reanimated';
 
 import {StyleSheet, Text, View} from 'react-native';
 

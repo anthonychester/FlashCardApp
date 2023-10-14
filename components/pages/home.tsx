@@ -20,7 +20,7 @@ import RNFS from 'react-native-fs';
 const BLANK = "\u001F"; //INFORMATION SEPARATOR ONE
 
 function Home(props: any): JSX.Element {
-
+  makeHeaders("ceece", 0,765,0,0,0);
   const isDarkMode = useColorScheme() === 'dark';
     return (
     <View style={styles.Home}>
@@ -45,23 +45,29 @@ const styles = StyleSheet.create({
 });
 
 function newSet() {
-  let name = "New Set";
-  let name_alo = "[" + name + BLANK.repeat(32-name.length) + "]";
-
-  let nums_alo = "[" + 0 + BLANK.repeat(7) + "]";
-
-  let file_cont = (name_alo + "\n") + (nums_alo + "\n").repeat(5) + "\n";
-  //console.log("-----------\n"+file_cont+"-----------\n", file_cont.length);
-
   let d = new Date();
   let path = RNFS.DocumentDirectoryPath + "/Sets/" + d.toISOString().replace(".", "-") + ".mdcs";
-  RNFS.writeFile(path.replaceAll(":","-"), file_cont, 'utf8')
+  RNFS.writeFile(path.replaceAll(":","-"), makeHeaders("New Set", 0, 0, 0, 0, 0), 'utf8')
     .then((success) => {
       //console.log('FILE WRITTEN!');
     })
     .catch((err) => {
       console.log(err.message);
     });
+}
+
+function makeHeaders(name: string, count: number, group1: number, group2: number, group3: number, group4: number): string {
+  let name_alo = "[" + name + BLANK.repeat(32-name.length) + "]";
+
+  let count_alo = "[" + count + BLANK.repeat(8-count.toString().length) + "]";
+  let group1_alo = "[" + group1 + BLANK.repeat(8-group1.toString().length) + "]";
+  let group2_alo = "[" + group2 + BLANK.repeat(8-group2.toString().length) + "]";
+  let group3_alo = "[" + group3 + BLANK.repeat(8-group3.toString().length) + "]";
+  let group4_alo = "[" + group4 + BLANK.repeat(8-group4.toString().length) + "]";
+
+  let file_cont = (name_alo + "\n") + (count_alo + "\n") + (group1_alo + "\n") + (group2_alo + "\n") + (group3_alo + "\n") + (group4_alo + "\n") +"\n";
+  console.log(file_cont.length);
+  return file_cont;
 }
 
 export default Home;

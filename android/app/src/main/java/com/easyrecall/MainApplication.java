@@ -1,4 +1,4 @@
-package com.awesomeproject;
+package com.easyrecall;
 
 import android.app.Application;
 import com.facebook.react.PackageList;
@@ -59,5 +59,4 @@ public class MainApplication extends Application implements ReactApplication {
     }
     ReactNativeFlipper.initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
   }
-
 }
