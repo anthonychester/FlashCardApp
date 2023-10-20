@@ -18,7 +18,6 @@ function NavBar(props: any) {
         
         useEffect(() => {
             if (!didMountRef.current) {
-                console.log("ffff");
                 onChangeTerm(props.title);
                 didMountRef.current = true;
               }
@@ -34,12 +33,23 @@ function NavBar(props: any) {
             </TouchableHighlight>
             <TextInput
                 onChangeText={(n) => {
-                    onChangeTerm(n);
-                    props.change(n);
+                    if(props.change) {
+                        onChangeTerm(n);
+                        props.change(n);
+                    }
                 }}
                 style={style.title}
                 value={term}
             />
+            </View>
+        );
+    } else if(props.type == "back") {
+        return(
+            <View style={style.Background}>
+            <TouchableHighlight style={style.to} onPress={props.onExit}>
+                <Image source={require('../assests/back.png')} style={style.back}/>
+            </TouchableHighlight>
+            <Text style={style.text}>{props.title}</Text>
             </View>
         );
     } else {
@@ -76,7 +86,8 @@ const style = StyleSheet.create({
         color: "white",
         fontSize: 25,
         textAlign: "center",
-        paddingLeft: "20%"
+        paddingLeft: "20%",
+        paddingRight: "5%",
       },
       to: {
         width: 30,
@@ -86,6 +97,14 @@ const style = StyleSheet.create({
       back: {
         width: 40,
         height: 60,
+      },
+      text: {
+        color: "white",
+        fontSize: 32,
+        textAlign: "center",
+        paddingTop: "2%",
+        paddingRight: "5%",
+        paddingLeft: "0%"
       }
 });
 

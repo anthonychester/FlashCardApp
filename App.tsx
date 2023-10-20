@@ -10,6 +10,7 @@ import { useColorScheme, Alert, BackHandler} from 'react-native';
 
 import Home from './components/pages/home'
 import Edit from './components/pages/edit'
+import EditSet from './components/pages/editset'
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DocumentPicker from 'react-native-document-picker';
@@ -27,12 +28,14 @@ function App(): JSX.Element {
     setDataVar(newData);
   }
 
-  const isDarkMode = useColorScheme() === 'dark';
+  //const isDarkMode = useColorScheme() === 'dark';
     switch (screen) {
       case "Home":
       return <Home data={data} setScreen={setScreen}/>;
       case "Edit":
       return <Edit data={data} setScreen={setScreen}/>;
+      case "EditSet":
+      return <EditSet data={data} setScreen={setScreen}/>;
       default:
       return <Loading />;
     }

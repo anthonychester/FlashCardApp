@@ -6,6 +6,7 @@ import {
   StatusBar,
   StyleSheet,
   Text,
+  TouchableHighlight,
   useColorScheme,
   View,
 } from 'react-native';
@@ -13,11 +14,12 @@ import {
 import RNFS from 'react-native-fs';
 import NavBar from '../NavBar';
 
-const BLANK = "\u001F"; //INFORMATION SEPARATOR ONE
+import { makeHeaders } from '../common';
+
 
 function Edit(props: any): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
-  console.log(props.data);
+  //console.log(props.data);
 
   const [cards, setCards] = useState([[""]]);
 
@@ -33,7 +35,7 @@ function Edit(props: any): JSX.Element {
             cards.push([card[0].trim(), card[1].trim()]);
         }
         setCards(cards);
-        console.log(cards);
+        //console.log(cards);
     }
   })
   }).catch((err) => {
@@ -42,42 +44,26 @@ function Edit(props: any): JSX.Element {
 
   function exit() {
     console.log("exit");
-    save();
     props.setScreen("Home", {});
     }
-
-  function save() {
-
-    let lines = [];
-    for(let i in cards) {
-      lines.push(cards[i].join("|||"));
-    }
-    let cont = lines.join("\n");
-    console.log(cont);
-    RNFS.write(props.data.path, cont, 90, 'utf8').catch((err) => {
-      console.error(err.message);
-    });
-  }
 
     return (
     <View style={styles.screen}>
         <NavBar 
-        type="edit" title={props.data.name} 
-        change={(x: any) => {console.log(x)}} 
+        type="back" title={props.data.name} 
         onExit={exit}
         />
         <Info data={props.data}/>
         <ScrollView style={styles.main}>
         {(() => {
-            console.log("s");
             let list = [];
             for(let i in cards) {
-                list.push(<Card a={cards[i][0]} b={cards[i][0]} key={i}/>);
+                list.push(<Card a={cards[i][0]} b={cards[i][1]} key={i}/>);
             }
-            console.log("e");
             return list;
         })()}
         </ScrollView>
+        <Menu setScreen={props.setScreen} data={props.data}/>
     </View>
   );
 }
@@ -99,6 +85,31 @@ function Info(props: any): JSX.Element {
         <Text style={styles.m}>{props.data.group4} Need Mastered</Text>
     </View>
 );
+}
+
+function Menu(props: any): JSX.Element {
+  return(
+    <View style={styles.menu}>
+      <MenuButton name="study" data={props.data} setScreen={props.setScreen}/>
+      <MenuButton name="edit" data={props.data} setScreen={props.setScreen} onPress={() => {
+        props.setScreen("EditSet", props.data);
+      }}/>
+      <MenuButton name="export"/>
+      <MenuButton name="delete"/>
+    </View>
+  )
+}
+
+function MenuButton(props: any): JSX.Element {
+  return(
+    <TouchableHighlight style={styles.menuButton}
+      onPress={props.onPress}
+      underlayColor="none">
+      <View style={[]}>
+        <Text style={styles.menuText}>{props.name}</Text>
+      </View>
+    </TouchableHighlight>
+  )
 }
 
 const styles = StyleSheet.create({
@@ -138,7 +149,23 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     marginRight: 20,
     color: "#FFFFFF"
+  },
+  menu: {
+    flexDirection: "row",
+    backgroundColor: "#819595",
+    borderRadius: 18
+  },
+  menuButton: {
+    width: "25%",
+    paddingTop: 20,
+    paddingBottom: 10,
+    borderRightWidth: 0.5
+  },
+  menuText: {
+    textAlign: "center"
   }
 });
+
+
 
 export default Edit;

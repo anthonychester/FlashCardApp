@@ -14,17 +14,9 @@ import RNFS from 'react-native-fs';
 
 import Loading from './loading';
 
-const BLANK = "\u001F"; //INFORMATION SEPARATOR ONE
+import { BLANK, getHeaderData } from './common';
 
-interface headers {
-  name: string;
-  count: number;
-  group4: number;
-  group3: number;
-  group2: number;
-  group1: number;
-  path: string;
-}
+
 
 function FileNav(props: any) {
   const [setData, setSetData] = useState([{}]);
@@ -143,29 +135,6 @@ const style = StyleSheet.create({
     color: 'black',
   },
 });
-
-
-
-function getHeaderData(str: string): headers {
-  let data = str.replaceAll(BLANK, "").split("\n");
-  let done = [];
-  for(let i=0;i<data.length-1;i++) { //last entery is \n
-    let row = data[i];
-    let s = row.indexOf("[") + 1;
-    let e = row.lastIndexOf("]")
-    done.push(row.slice(s,e));
-  }
-  //console.log(done, data.length);
-  return {
-    name: done[0],
-  count: Number(done[1]),
-  group4: Number(done[2]),
-  group3: Number(done[3]),
-  group2: Number(done[4]),
-  group1: Number(done[5]),
-  path: ""
-  };
-}
 
 export default FileNav;
 
