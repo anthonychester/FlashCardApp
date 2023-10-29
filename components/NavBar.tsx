@@ -1,5 +1,5 @@
 import React, {useRef, useEffect} from 'react';
-import {Button, Alert, TextInput} from 'react-native';
+import {Button, Alert, TextInput, Pressable} from 'react-native';
 import Animated, {useSharedValue, useAnimatedStyle, interpolate, withTiming} from 'react-native-reanimated';
 
 import {
@@ -7,7 +7,6 @@ import {
     Text,
     View,
     Image,
-    TouchableHighlight
   } from 'react-native';
 
 function NavBar(props: any) {
@@ -28,9 +27,9 @@ function NavBar(props: any) {
          */
         return(
             <View style={style.Background}>
-            <TouchableHighlight style={style.to} onPress={props.onExit}>
+            <Pressable style={style.to} onPress={props.onExit}>
                 <Image source={require('../assests/back.png')} style={style.back}/>
-            </TouchableHighlight>
+            </Pressable>
             <TextInput
                 onChangeText={(n) => {
                     if(props.change) {
@@ -46,9 +45,9 @@ function NavBar(props: any) {
     } else if(props.type == "back") {
         return(
             <View style={style.Background}>
-            <TouchableHighlight style={style.to} onPress={props.onExit}>
+            <Pressable style={style.to} onPress={props.onExit}>
                 <Image source={require('../assests/back.png')} style={style.back}/>
-            </TouchableHighlight>
+            </Pressable>
             <Text style={style.text}>{props.title}</Text>
             </View>
         );

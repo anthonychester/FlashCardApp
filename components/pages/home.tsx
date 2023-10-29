@@ -25,7 +25,7 @@ function Home(props: any): JSX.Element {
     <View style={styles.Home}>
       <NavBar />
       <View style={styles.NewCardHolder}>
-        <FlashCard front="&new_icon& **New Set**" onclick={() => {newSet()}}/>
+        <FlashCard front="&new_icon& **New Set**" onclick={() => {newSet()}} noFlip="true"/>
       </View>
       <FileNav setScreen={props.setScreen}/>
     </View>

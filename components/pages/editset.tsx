@@ -20,29 +20,38 @@ function EditSet(props: any): JSX.Element {
 
   RNFS.stat(props.data.path).then((data) => {
   RNFS.read(props.data.path, data.size-90, 90, "utf8").then((str) => {
-    if(cards[0][0] == "") {
+    if(cards[0] && cards[0][0] == "") {
         //console.log(str);
         //str = "1a|||1b\n2a|||2b\n3a|||3b\n4a|||4b";
         let lines = str.split("\n");
         let cards = [];
         for(let i=0; i<lines.length;i++) {
             let card = lines[i].split("|||");
-            cards.push([card[0].trim(), card[1].trim()]);
+            if(card[0] && card[1]) {
+              let d = new Date();
+              let time = d.toISOString();
+
+              if(card[2]) {
+                time = card[2];
+              }
+              cards.push([card[0].trim(), card[1].trim(), time]);
+            }
         }
         setCards(cards);
         //console.log(cards);
     }
-  })
+  }).catch((err) => {
+    console.error(err.message);
+  });
   }).catch((err) => {
     console.error(err.message);
   });
 
     if(selected >= 0) {
         return(
-            <EditCard card={cards[selected]} onExit={(front: string, back: string) => {
-                let d = new Date();
-                cards[selected] = [front, back, d.toISOString()];
-                console.log(cards[selected]);
+            <EditCard card={cards[selected]} onExit={(front: string, back: string, iso: string) => {
+                cards[selected] = [front, back, iso];
+                //console.log(cards[selected]);
                 setSelected(-1);
             }}/>
         );
@@ -73,6 +82,7 @@ function EditSet(props: any): JSX.Element {
             }
             return list;
         })()}
+        <Card a="Add Card" key="add" id="add"/>
         </ScrollView>
     </View>
     );
@@ -83,15 +93,27 @@ function EditSet(props: any): JSX.Element {
         let lines = [];
         for(let i in cards) {
           lines.push(cards[i].join("|||"));
+          console.log(cards[i])
         }
         let cont = lines.join("\n");
-        console.log(cont);
+        //console.log("cont: ----------\n" + cont);
         RNFS.write(props.data.path, cont, 90, 'utf8').catch((err) => {
           console.error(err.message);
         });
       }
 
       function Card(props: any): JSX.Element {
+        if(props.id == "add") {
+          return(
+            <TouchableHighlight onPress={() => {
+                setSelected(cards.length);
+            }}>
+                <View style={styles.cardMain}>
+                    <Text style={styles.cardText}>{props.a}</Text>
+                </View>
+            </TouchableHighlight>
+        );
+        } else {
         return(
             <TouchableHighlight onPress={() => {
                 setSelected(props.id);
@@ -102,6 +124,7 @@ function EditSet(props: any): JSX.Element {
                 </View>
             </TouchableHighlight>
         );
+          }
     }
 }
 

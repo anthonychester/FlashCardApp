@@ -8,6 +8,10 @@ import {
     View,
   } from 'react-native';
 
+import { cardStyles } from "./cardStyles"
+
+import {mdInterperter} from '../mdinterpreter/main';
+
 function FlashCard(props: any) {
     
         const spin = useSharedValue<number>(0);
@@ -34,9 +38,33 @@ function FlashCard(props: any) {
             };
           }, []);
 
-          console.log(makeMarkdown(props.front));
+  function makeMarkdown(text: any): any {
+    
+    let mdi =  new mdInterperter(text);
+    mdi.parse();
+    let out = [];
+    for(let i=0; i<mdi.text.length;i++) {
+      console.log(mdi.text[i]);
+      console.log(mdi.style[i]);
+      
+      let curStyles: any[] = [];
+      for(let ii=0;i<mdi.style.length;ii++) {
+        //curStyles.push(cardStyles["d"]); //mdi.style[i][ii]
+      }
+      
+      out.push(<Text style={curStyles} key={i}>{mdi.text[i]}</Text>)
+    }
+    return out;
+  }
+
+          //console.log(makeMarkdown(props.front));
         return(
-          <TouchableHighlight onPress={props.onclick} underlayColor="none">
+          <TouchableHighlight onPress={() => {
+            props.onclick();
+            if(!props.noFlip) {
+              spin.value = spin.value ? 0 : 1;
+            }
+          }} underlayColor="none">
             <View style={styles.main}>
                 
                 <Animated.View style={[styles.front, frontAnimatedStyle]}>
@@ -55,18 +83,6 @@ function FlashCard(props: any) {
 //add styles based on markdown i.e. #H1 -> h1: {textSize: x} 
 //https://www.markdownguide.org/cheat-sheet/
 //https://reactnative.dev/docs/text-style-props
-const cardStyles = StyleSheet.create({
-    d: {
-      color: "black"
-    },
-    bold: {
-      fontWeight: "bold",
-      color: "black"
-    },
-    h1: {
-      fontSize: 30
-    }
-});
 
 const styles = StyleSheet.create({
     front: {
@@ -93,57 +109,4 @@ const styles = StyleSheet.create({
      }
   });
 
-function makeMarkdown(raw: string): any {
-  let byline = raw.split("\n");
-  let map = byline.map(parseMarkdown);
-  let list: any[] = [];
-  for (let i in map) {
-    let text = map[i].text;
-    let style = map[i].style;
-    let row: any[] = [];
-    for (let ii=0; ii<text.length; ii++) {
-      console.log(ii, style[ii][0]);
-      row.push(<Text style={style[ii][0]} key={ii}>{text[ii]}</Text>);
-    }
-    list.push(<View style={{flexDirection: 'row'}} key={-1}>{row}</View>);
-  }
-  return list;
-}
-
-function parseMarkdown(line: string): {style: any[]; text: string[];} {
-  let char = line.split("");
-  let out: string[] = [];
-  let temp: string[] = [];
-  let styles: any[] = [];
-  
-  let mode = 0; //none
-  let i=0; // check for # at char 0, countthem apply to all following gorups
-  for (i; i<char.length; i++) {
-    let c = char[i];
-
-      if (c == "*" && i+1 < char.length && c == "*") { // check based on symbol and keep symbol
-        if(mode == 1) {
-          out.push(temp.join(""));
-          temp = [];
-          i++;
-          mode = 0;
-        } else {
-          styles.push([cardStyles.d]);
-          out.push(temp.join(""));
-          temp = [];
-          i++;
-          mode = 1;
-          styles.push([cardStyles.bold]);
-        }
-      } else {
-        temp.push(c);
-    }
-  }
-
-  if(temp.length > 0) {
-    out.push(temp.join(""));
-    styles.push([cardStyles.d]);
-  }
-  return {style: styles, text: out};
-}
 export default FlashCard;

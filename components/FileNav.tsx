@@ -14,77 +14,70 @@ import RNFS from 'react-native-fs';
 
 import Loading from './loading';
 
-import { BLANK, getHeaderData } from './common';
-
-
+import {BLANK, getHeaderData} from './common';
 
 function FileNav(props: any) {
-  const [setData, setSetData] = useState([{}]);
-  const [sets, setSets] = useState(false);
+  const [setData, setSetData] = useState<{}[]>([]);
+  const [sets, setSets] = useState<any[]>();
   //const [dataReady, setDataReady] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
   function refreshSets() {
     setRefreshing(true);
-  RNFS.readDir(RNFS.DocumentDirectoryPath + "/Sets") // On Android, use "RNFS.DocumentDirectoryPath" (MainBundlePath is not defined)
-          .then(result => {
-            //console.log('GOT RESULT', result);
-            //setSetData([{name: 'test', cards: 5, due: 7}]);
-            //setSets(makeFileElem(setData));
-            //setDataReady(true);
-
-            //let set_data: any[] = [];
-
-            for(let f in result) {
-              //console.log("f", f);
-              //is file and .markdown cardset
-              let res = result[f];
-              if (res.isFile() && res.name.indexOf(".mdcs")) {
-                  RNFS.read(res.path, 90, 0, "utf8").then((str) => {
-                      //console.log(str);
-                      let file_data = getHeaderData(str);
-                      file_data.path = res.path;
-                      if(!sets) {
-                        setSetData([file_data]);
-                      } else { //use hashmap to prevent dups
-                        setSetData(setData.concat(file_data));
-                      }
-                      setSets(makeFileElem(setData, props.setScreen));
-                      //console.log(set_data);
-                      //setDataReady(true);
-                  }).catch((err) => {
-                    console.log(err.message);
-                  });
-              }
-            }
-            setRefreshing(false);
-          })
-          .catch(err => {
-            console.log("error");
-            console.log(err.message + ':', err.code);
-            setRefreshing(false);
-          });
-}
-  useEffect(() => {
-        RNFS.mkdir(RNFS.DocumentDirectoryPath + "/Sets")
-        .then( () => {
-          refreshSets();
-        })
-        .catch(err => {
-          console.log("error");
-          console.log(err.message +':', err.code);
-        });
-  }, []);
-  if (false) {
-    //refreshSets();
-    return <Loading />;
-  } else {
-    return (
-    <ScrollView style={style.main} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refreshSets} />}>
-        {sets} 
-    </ScrollView>
-        );
+    RNFS.readDir(RNFS.DocumentDirectoryPath + '/Sets')
+      .then(result => {
+        //console.log('GOT RESULT', result);
+        let data: {}[] = [];
+        for (let f in result) {
+          let res = result[f];
+          if (res.isFile() && res.name.indexOf('.mdcs')) {
+            RNFS.read(res.path, 90, 0, 'utf8')
+              .then(str => {
+                let file_data = getHeaderData(str);
+                file_data.path = res.path;
+                if (data.length == 0) {
+                  data.push(file_data);
+                  //console.log('1', data);
+                } else {
+                  data.push(file_data);
+                  //console.log('+', data);
+                }
+              })
+              .catch(err => {
+                //console.log(err.message);
+              });
+          }
+        }
+        setSetData(data);
+        setSets(makeFileElem(setData, props.setScreen));
+        setRefreshing(false);
+      })
+      .catch(err => {
+        console.log('error');
+        console.log(err.message + ':', err.code);
+      });
   }
+  useEffect(() => {
+    RNFS.mkdir(RNFS.DocumentDirectoryPath + '/Sets')
+      .then(() => {
+        setRefreshing(false);
+        refreshSets();
+      })
+      .catch(err => {
+        console.log('error');
+        console.log(err.message + ':', err.code);
+      });
+  }, []);
+
+  return (
+    <ScrollView
+      style={style.main}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={refreshSets} />
+      }>
+      {sets}
+    </ScrollView>
+  );
 }
 
 function File(props: any) {
@@ -92,8 +85,7 @@ function File(props: any) {
     <TouchableHighlight
       onPress={() => {
         console.log('edit file: ' + props.data);
-        props.setScreen("Edit", props.data);
-
+        props.setScreen('Edit', props.data);
       }}
       underlayColor="none">
       <View style={style.fileMain}>
@@ -109,10 +101,17 @@ function makeFileElem(setData: any[], setScreen: any): any {
   for (let i = 0; i < setData.length; i++) {
     let data = setData[i];
     //console.log(data.name);
-    if(data.name) {
-    files.push(
-      <File name={data.name} numCards={data.count} due={data.group1} data={data} key={i} setScreen={setScreen}/>,
-    );
+    if (data.name) {
+      files.push(
+        <File
+          name={data.name}
+          numCards={data.count}
+          due={data.group1}
+          data={data}
+          key={i}
+          setScreen={setScreen}
+        />,
+      );
     }
   }
   return files;
@@ -137,5 +136,3 @@ const style = StyleSheet.create({
 });
 
 export default FileNav;
-
-
