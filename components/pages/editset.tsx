@@ -30,11 +30,15 @@ function EditSet(props: any): JSX.Element {
             if(card[0] && card[1]) {
               let d = new Date();
               let time = d.toISOString();
+              let count = "0";
 
               if(card[2]) {
                 time = card[2];
               }
-              cards.push([card[0].trim(), card[1].trim(), time]);
+              if(card[3]) {
+                count = card[3];
+              }
+              cards.push([card[0].trim(), card[1].trim(), time, count]);
             }
         }
         setCards(cards);
@@ -49,8 +53,8 @@ function EditSet(props: any): JSX.Element {
 
     if(selected >= 0) {
         return(
-            <EditCard card={cards[selected]} onExit={(front: string, back: string, iso: string) => {
-                cards[selected] = [front, back, iso];
+            <EditCard card={cards[selected]} onExit={(front: string, back: string, iso: string, count: string) => {
+                cards[selected] = [front, back, iso, count];
                 //console.log(cards[selected]);
                 setSelected(-1);
             }}/>
@@ -64,6 +68,7 @@ function EditSet(props: any): JSX.Element {
           RNFS.write(props.data.path, makeHeaders(new_name, 0, 0, 0, 0, 0), 0, 'utf8')
             .then((success) => {
           //console.log('FILE WRITTEN!');
+          props.data.name = new_name;
           })
           .catch((err) => {
             console.log(err.message);
@@ -89,18 +94,26 @@ function EditSet(props: any): JSX.Element {
     }
     
     function save() {
-
         let lines = [];
         for(let i in cards) {
           lines.push(cards[i].join("|||"));
           console.log(cards[i])
+          console.log(cards[i].join("|||"));
         }
         let cont = lines.join("\n");
-        //console.log("cont: ----------\n" + cont);
-        RNFS.write(props.data.path, cont, 90, 'utf8').catch((err) => {
+        console.log("cont: ----------\n" + cont);
+        RNFS.write(props.data.path, cont, 91, 'utf8').catch((err) => {
           console.error(err.message);
         });
-      }
+
+         RNFS.write(props.data.path, makeHeaders(props.data.name, cards.length, 0, 0, 0, 0), 0, 'utf8')
+            .then((success) => {
+          //console.log('FILE WRITTEN!');
+          })
+          .catch((err) => {
+            console.log(err.message);
+          });
+        }
 
       function Card(props: any): JSX.Element {
         if(props.id == "add") {

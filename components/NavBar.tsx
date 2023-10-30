@@ -89,9 +89,10 @@ const style = StyleSheet.create({
         paddingRight: "5%",
       },
       to: {
-        width: 30,
-        height: 30,
-        paddingLeft: 10
+        width: 45,
+        height: 60,
+        paddingLeft: 0,
+        marginLeft: 10
       },
       back: {
         width: 40,

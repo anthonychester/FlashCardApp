@@ -91,10 +91,10 @@ function File(props: any) {
       <View style={style.fileMain}>
         <Text style={style.fileText}>{props.name}</Text>
         <Text style={style.fileText}>{props.numCards}</Text>
-        <Text style={style.fileText}>{props.due}</Text>
+        
       </View>
     </TouchableHighlight>
-  );
+  );//<Text style={style.fileText}>{props.due}</Text>
 }
 function makeFileElem(setData: any[], setScreen: any): any {
   let files: any[] = [];
@@ -132,6 +132,7 @@ const style = StyleSheet.create({
   },
   fileText: {
     color: 'black',
+    marginHorizontal: 20
   },
 });
 

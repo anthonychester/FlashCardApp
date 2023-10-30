@@ -12,7 +12,6 @@ export interface headers {
 
 export function makeHeaders(name: string, count: number, group1: number, group2: number, group3: number, group4: number): string {
     let name_alo = "[" + name + BLANK.repeat(32-name.length) + "]";
-  
     let count_alo = "[" + count + BLANK.repeat(8-count.toString().length) + "]";
     let group1_alo = "[" + group1 + BLANK.repeat(8-group1.toString().length) + "]";
     let group2_alo = "[" + group2 + BLANK.repeat(8-group2.toString().length) + "]";

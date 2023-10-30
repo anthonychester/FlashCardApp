@@ -16,7 +16,7 @@ import NavBar from '../NavBar';
 
 import {makeHeaders} from '../common';
 
-function Edit(props: any): JSX.Element {
+function Overview(props: any): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
   //console.log(props.data);
 
@@ -25,10 +25,11 @@ function Edit(props: any): JSX.Element {
 
   RNFS.stat(props.data.path)
     .then(data => {
+      console.log(data.size);
       RNFS.read(props.data.path, data.size - 90, 90, 'utf8')
         .then(str => {
           if (cards[0] && cards[0][0] == '') {
-            //console.log(str);
+            //console.log("str", str);
             //str = "1a|||1b\n2a|||2b\n3a|||3b\n4a|||4b";
             let lines = str.split('\n');
             let cards = [];
@@ -85,6 +86,8 @@ function Edit(props: any): JSX.Element {
         setScreen={props.setScreen}
         data={props.data}
         checkDelete={checkDelete}
+        cards={cards}
+        path={props.path}
       />
     </View>
   );
@@ -115,7 +118,14 @@ function Info(props: any): JSX.Element {
 function Menu(props: any): JSX.Element {
   return (
     <View style={styles.menu}>
-      <MenuButton name="study" data={props.data} setScreen={props.setScreen} />
+      <MenuButton
+        name="study"
+        data={props.data}
+        setScreen={props.setScreen}
+        onPress={() => {
+          props.setScreen('Study', {cards: props.cards, path: props.path});
+        }}
+      />
       <MenuButton
         name="edit"
         data={props.data}
@@ -163,25 +173,25 @@ function DeletePopup(props: any): JSX.Element {
         <View style={styles.modalView}>
           <Text style={styles.modalText}>Delete {props.name}?</Text>
           <View style={styles.deleteButtons}>
-          <Pressable
-            style={[styles.button, styles.buttonClose]}
-            onPress={() =>
-              RNFS.unlink(props.path)
-                .then(() => {
-                  console.log('FILE DELETED');
-                  props.setScreen('Home', {});
-                })
-                .catch(err => {
-                  console.error(err.message);
-                })
-            }>
-            <Text style={styles.textStyle}>Delete</Text>
-          </Pressable>
-          <Pressable
-            style={[styles.button, styles.buttonClose]}
-            onPress={() => props.checkDelete(!props.deletePopup)}>
-            <Text style={styles.textStyle}>Close</Text>
-          </Pressable>
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={() =>
+                RNFS.unlink(props.path)
+                  .then(() => {
+                    console.log('FILE DELETED');
+                    props.setScreen('Home', {});
+                  })
+                  .catch(err => {
+                    console.error(err.message);
+                  })
+              }>
+              <Text style={styles.textStyle}>Delete</Text>
+            </Pressable>
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => props.checkDelete(!props.deletePopup)}>
+              <Text style={styles.textStyle}>Close</Text>
+            </Pressable>
           </View>
         </View>
       </View>
@@ -270,7 +280,7 @@ const styles = StyleSheet.create({
   buttonClose: {
     backgroundColor: '#C44900',
     marginHorizontal: 5,
-    marginVertical: 3
+    marginVertical: 3,
   },
   textStyle: {
     color: 'white',
@@ -283,8 +293,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   deleteButtons: {
-    flexDirection: "row"
-  }
+    flexDirection: 'row',
+  },
 });
 
-export default Edit;
+export default Overview;

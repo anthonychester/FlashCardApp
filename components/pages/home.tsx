@@ -10,47 +10,61 @@ import {
   View,
 } from 'react-native';
 
-
 import FlashCard from '../FlashCard';
 import NavBar from '../NavBar';
 import FileNav from '../FileNav';
-import { makeHeaders } from '../common';
+import {makeHeaders} from '../common';
 
 import RNFS from 'react-native-fs';
 
 function Home(props: any): JSX.Element {
-  makeHeaders("ceece", 0,765,0,0,0);
+  //makeHeaders("ceece", 0,765,0,0,0);
   const isDarkMode = useColorScheme() === 'dark';
-    return (
+  return (
     <View style={styles.Home}>
       <NavBar />
       <View style={styles.NewCardHolder}>
-        <FlashCard front="&new_icon& **New Set**" onclick={() => {newSet()}} noFlip="true"/>
+        <FlashCard
+          front="![New Set](/images/new_set.png) **New Set**"
+          back=""
+          onclick={() => {
+            newSet();
+          }}
+          noFlip="true"
+        />
       </View>
-      <FileNav setScreen={props.setScreen}/>
+      <FileNav setScreen={props.setScreen} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   NewCardHolder: {
-    justifyContent: 'center', 
-    alignItems: 'center'
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   Home: {
-    backgroundColor: "#232020",
-    height: "100%"
-  }
+    backgroundColor: '#232020',
+    height: '100%',
+  },
 });
 
 function newSet() {
   let d = new Date();
-  let path = RNFS.DocumentDirectoryPath + "/Sets/" + d.toISOString().replace(".", "-") + ".mdcs";
-  RNFS.writeFile(path.replaceAll(":","-"), makeHeaders("New Set", 0, 0, 0, 0, 0), 'utf8')
-    .then((success) => {
+  let path =
+    RNFS.DocumentDirectoryPath +
+    '/Sets/' +
+    d.toISOString().replace('.', '-') +
+    '.mdcs';
+  RNFS.writeFile(
+    path.replaceAll(':', '-'),
+    makeHeaders('New Set', 0, 0, 0, 0, 0),
+    'utf8',
+  )
+    .then(success => {
       //console.log('FILE WRITTEN!');
     })
-    .catch((err) => {
+    .catch(err => {
       console.log(err.message);
     });
 }

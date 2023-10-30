@@ -25,13 +25,15 @@ function EditCard(props: any): JSX.Element {
   const [front, setFront] = useState('');
   const [back, setBack] = useState('');
 
+  const card = props.card;
+
   useEffect(() => {
     if (!didMountRef.current) {
       
-      if (props.card) {
-        setFront(props.card[0]);
-        setBack(props.card[1]);
-        setValue(props.card[0]);
+      if (card) {
+        setFront(card[0]);
+        setBack(card[1]);
+        setValue(card[0]);
       } else {
         setValue("");
       }
@@ -58,7 +60,7 @@ function EditCard(props: any): JSX.Element {
         title={''}
         onExit={() => {
           let d = new Date();
-          props.onExit(front, back, d.toISOString());
+          props.onExit(front, back, d.toISOString(), (card ? card[3] : 0));
         }}
       />
       <View style={styles.centeredView}>
