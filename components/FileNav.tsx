@@ -53,8 +53,8 @@ function FileNav(props: any) {
         setRefreshing(false);
       })
       .catch(err => {
-        console.log('error');
-        console.log(err.message + ':', err.code);
+        console.error('error');
+        console.error(err.message + ':', err.code);
       });
   }
   useEffect(() => {
@@ -64,8 +64,8 @@ function FileNav(props: any) {
         refreshSets();
       })
       .catch(err => {
-        console.log('error');
-        console.log(err.message + ':', err.code);
+        console.error('error');
+        console.error(err.message + ':', err.code);
       });
   }, []);
 
@@ -84,7 +84,7 @@ function File(props: any) {
   return (
     <TouchableHighlight
       onPress={() => {
-        console.log('edit file: ' + props.data);
+        //console.log('edit file: ' + props.data);
         props.setScreen('Edit', props.data);
       }}
       underlayColor="none">

@@ -25,8 +25,8 @@ function Home(props: any): JSX.Element {
       <NavBar />
       <View style={styles.NewCardHolder}>
         <FlashCard
-          front="![New Set](/images/new_set.png) **New Set**"
-          back=""
+          front='!["New Set"]("/images/new_set.png") **New Set**'
+          back=''
           onclick={() => {
             newSet();
           }}
@@ -65,7 +65,7 @@ function newSet() {
       //console.log('FILE WRITTEN!');
     })
     .catch(err => {
-      console.log(err.message);
+      console.error(err.message);
     });
 }
 

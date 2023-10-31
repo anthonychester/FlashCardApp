@@ -11,6 +11,7 @@ import {
 import { cardStyles } from "./cardStyles"
 
 import {mdInterperter} from '../mdinterpreter/main';
+import { makeMarkdown } from './common';
 
 function FlashCard(props: any) {
     
@@ -37,39 +38,6 @@ function FlashCard(props: any) {
               ],
             };
           }, []);
-
-  function makeMarkdown(text: any): any {
-    
-    let mdi =  new mdInterperter(text);
-    mdi.parse();
-    let out = [];
-    let temp = [];
-    for(let i=0; i<mdi.text.length;i++) {
-
-      if(mdi.style[i][0] == "nl") {
-        out.push(<View style={{flexDirection: 'row'}} key={out.length}>{temp}</View>);
-        temp = [];
-      } else {
-      let curStyles: any[] = [];
-      for(let ii=0;ii<mdi.style[i].length;ii++) {
-        
-        //@ts-ignore
-        curStyles.push(cardStyles[mdi.style[i][ii]]); //mdi.style[i][ii]
-      }
-      if(curStyles.length == 0) {
-        //@ts-ignore
-        curStyles.push(cardStyles.d);
-      }
-        temp.push(<Text style={curStyles} key={i}>{mdi.text[i]}</Text>)
-      }
-    }
-
-    if(temp.length > 0) {
-      out.push(<View style={{flexDirection: 'row'}} key={out.length}>{temp}</View>);
-      temp = [];
-    }
-    return out;
-  }
 
           //console.log(makeMarkdown(props.front));
         return(

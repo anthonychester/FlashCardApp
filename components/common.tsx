@@ -1,3 +1,9 @@
+import { Text, View } from "react-native";
+import { mdInterperter } from "../mdinterpreter/main";
+
+import { cardStyles } from "./cardStyles"
+
+
 export const BLANK = "\u001F"; //INFORMATION SEPARATOR ONE
 
 export interface headers {
@@ -41,4 +47,36 @@ export function getHeaderData(str: string): headers {
   group1: Number(done[5]),
   path: ""
   };
+}
+
+export function makeMarkdown(text: any): any {
+  let mdi =  new mdInterperter(text);
+  mdi.parse();
+  let out = [];
+  let temp = [];
+  for(let i=0; i<mdi.style.length;i++) {
+    //console.log("s", mdi.style);
+    if(mdi.style[i][0] == "nl") {
+      out.push(<View style={{flexDirection: 'row'}} key={out.length}>{temp}</View>);
+      temp = [];
+    } else {
+    let curStyles: any[] = [];
+    for(let ii=0;ii<mdi.style[i].length;ii++) {
+      
+      //@ts-ignore
+      curStyles.push(cardStyles[mdi.style[i][ii]]); //mdi.style[i][ii]
+    }
+    if(curStyles.length == 0) {
+      //@ts-ignore
+      curStyles.push(cardStyles.d);
+    }
+      temp.push(<Text style={curStyles} key={i}>{mdi.text[i]}</Text>)
+    }
+  }
+
+  if(temp.length > 0) {
+    out.push(<View style={{flexDirection: 'row'}} key={out.length}>{temp}</View>);
+    temp = [];
+  }
+  return out;
 }

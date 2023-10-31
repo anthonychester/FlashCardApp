@@ -71,7 +71,7 @@ function EditSet(props: any): JSX.Element {
           props.data.name = new_name;
           })
           .catch((err) => {
-            console.log(err.message);
+            console.error(err.message);
           });
         }} 
         onExit={() => {
@@ -97,11 +97,11 @@ function EditSet(props: any): JSX.Element {
         let lines = [];
         for(let i in cards) {
           lines.push(cards[i].join("|||"));
-          console.log(cards[i])
-          console.log(cards[i].join("|||"));
+          //console.log(cards[i])
+          //console.log(cards[i].join("|||"));
         }
         let cont = lines.join("\n");
-        console.log("cont: ----------\n" + cont);
+        //console.log("cont: ----------\n" + cont);
         RNFS.write(props.data.path, cont, 91, 'utf8').catch((err) => {
           console.error(err.message);
         });
@@ -111,7 +111,7 @@ function EditSet(props: any): JSX.Element {
           //console.log('FILE WRITTEN!');
           })
           .catch((err) => {
-            console.log(err.message);
+            console.error(err.message);
           });
         }
 

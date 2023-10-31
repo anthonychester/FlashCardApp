@@ -25,7 +25,7 @@ function Overview(props: any): JSX.Element {
 
   RNFS.stat(props.data.path)
     .then(data => {
-      console.log(data.size);
+      //console.log(data.size);
       RNFS.read(props.data.path, data.size - 90, 90, 'utf8')
         .then(str => {
           if (cards[0] && cards[0][0] == '') {
@@ -35,9 +35,9 @@ function Overview(props: any): JSX.Element {
             let cards = [];
             for (let i = 0; i < lines.length; i++) {
               let card = lines[i].split('|||');
-              console.log(str);
-              if (card[0] && card[1]) {
-                cards.push([card[0].trim(), card[1].trim(), card[2].trim()]);
+            //console.log(str);
+              if (card[0] && card[1] && card[3]) {
+                cards.push([card[0].trim(), card[1].trim(), card[2].trim(), card[3].trim()]);
               }
             }
 
@@ -61,7 +61,6 @@ function Overview(props: any): JSX.Element {
     //console.log("exit");
     props.setScreen('Home', {});
   }
-
   return (
     <View style={styles.screen}>
       <NavBar type="back" title={props.data.name} onExit={exit} />
@@ -87,7 +86,7 @@ function Overview(props: any): JSX.Element {
         data={props.data}
         checkDelete={checkDelete}
         cards={cards}
-        path={props.path}
+        path={props.data.path}
       />
     </View>
   );
@@ -123,6 +122,7 @@ function Menu(props: any): JSX.Element {
         data={props.data}
         setScreen={props.setScreen}
         onPress={() => {
+          //console.log("M", props.cards);
           props.setScreen('Study', {cards: props.cards, path: props.path});
         }}
       />
@@ -178,7 +178,7 @@ function DeletePopup(props: any): JSX.Element {
               onPress={() =>
                 RNFS.unlink(props.path)
                   .then(() => {
-                    console.log('FILE DELETED');
+                    //console.log('FILE DELETED');
                     props.setScreen('Home', {});
                   })
                   .catch(err => {

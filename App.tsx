@@ -24,7 +24,7 @@ function App(): JSX.Element {
   const [data, setDataVar] = useState({});
 
   function setScreen(name: string, newData: any) {
-    console.log("Name: ", name, screen);
+    //console.log("Name: ", name, screen);
     setScreenVar(name);
     setDataVar(newData);
   }

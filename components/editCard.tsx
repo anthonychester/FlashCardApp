@@ -14,28 +14,43 @@ import {
 import RNFS from 'react-native-fs';
 import NavBar from './NavBar';
 
-import {makeHeaders} from './common';
+import {makeHeaders, makeMarkdown} from './common';
 import FlashCard from './FlashCard';
 import { useSharedValue } from 'react-native-reanimated';
+import { mdInterperter } from '../mdinterpreter/main';
+
+let style: string[][] = [[]];
+let text: string[] = [];
+let temp: string = "";
 
 function EditCard(props: any): JSX.Element {
   const didMountRef = useRef(false);
-  const [value, setValue] = useState('');
-  const [side, setSide] = useState(0);
-  const [front, setFront] = useState('');
-  const [back, setBack] = useState('');
+  const [value, setValue] = useState<any[]>([]);
+  //let card_value: any[] = [];
+  let card = props.card;
 
-  const card = props.card;
+  const [side, setSide] = useState("f");
+  const [front, setFront] = useState(""); 
+  const [back, setBack] = useState(""); 
 
   useEffect(() => {
     if (!didMountRef.current) {
       
-      if (card) {
+      style = [[]];
+      text = [];
+      temp = "";
+
+      if (card && card[0] && card[1]) {
         setFront(card[0]);
         setBack(card[1]);
-        setValue(card[0]);
-      } else {
-        setValue("");
+        
+        let mdi = new mdInterperter(card[0]);
+        mdi.parse();
+        style = mdi.style;
+        text = mdi.text;
+        
+        let list = makeMarkdown(mdi.toraw());
+        setValue(list);
       }
 
       
@@ -43,14 +58,50 @@ function EditCard(props: any): JSX.Element {
     }
   });
 
-  function update_text(new_text: string) {
-    if(side) {
-      setBack(new_text);
-      setValue(new_text);
+  function update_text(char_in: string) {
+    let char = char_in.slice(1,2);
+    if(char_in == "") {
+      temp = temp.slice(0, temp.length-1);
+      if(temp.length == 0) {
+        text.pop();
+        style.pop();
+        if(text.length > 0) {
+          temp = text[text.length-1];
+        }
+      } else {
+        text.pop();
+        style.pop();
+        style.push([]);
+        text.push(temp);
+      }
+    }else if(char == " ") { 
+      //console.log("blank");
+      text.push("");
+      style.push([]);
+      temp = "";
     } else {
-      setFront(new_text);
-      setValue(new_text);
+      temp += char;
+      text.pop();
+      text.push(temp);
+      style.pop();
+      style.push([]);
+      
     }
+    console.log(text, style);
+    let mdi = new mdInterperter("");
+    mdi.setData(text, style);
+    //console.log(mdi.toraw());
+    let raw = mdi.toraw();
+    let list = makeMarkdown(raw);
+    setValue(list);
+
+    if(side == "f") {
+      setFront(raw);
+    } else {
+      setBack(raw);
+    }
+
+    //card_value = list;
   }
 
   return (
@@ -66,14 +117,23 @@ function EditCard(props: any): JSX.Element {
       <View style={styles.centeredView}>
         <View style={styles.main}>
           <View style={styles.front}>
+          <View style={styles.edit}>
+          {(() => {console.log("r"); return value})()}
             <TextInput
-              onChangeText={update_text}
+              onChangeText={(t:string) => {update_text(t); }}
               style={styles.input}
-              value={value}
+              value={" "}
             />
+            </View>
             <Pressable onPress={() => { 
-              setSide(side ? 0 : 1);
-              setValue(side ? front : back);
+              setValue(makeMarkdown(side=="f" ? back : front));
+              let mdi = new mdInterperter(side=="f" ? back : front);
+              mdi.parse();
+              text = mdi.text;
+              style = mdi.style;
+
+              setSide(side=="f" ? "b" : "f");
+              
               }} style={styles.flip}>
             <Image source={require('../assests/flip.png')} style={styles.icon}/>
           </Pressable>
@@ -146,15 +206,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  edit: {
+    flexDirection: "row"
+  },
   main: {
     marginVertical: 30,
   },
   input: {
-    height: '100%',
-    width: '100%',
-    margin: 12,
-    padding: 10,
-    borderRadius: 12,
+    height: 20,
+    margin: 0,
+    padding: 0,
+    borderRadius: 0,
     textAlign: 'center',
     color: 'black',
   },
