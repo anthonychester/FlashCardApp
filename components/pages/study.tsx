@@ -11,7 +11,7 @@ import {
 import RNFS from 'react-native-fs';
 import NavBar from '../NavBar';
 import FlashCard from '../FlashCard';
-import { makeHeaders } from '../common';
+import { makeHeaders, mergeSort } from '../common';
 
 function Study(props: any): JSX.Element {
   const didMountRef = useRef(false);
@@ -25,18 +25,18 @@ function Study(props: any): JSX.Element {
   });
 
   function save() {
-    let lines = [];
-        for(let i in cards) {
+    let lines: string[] = [];
+        for(let i=0;i<cards.length;i++) {
           lines.push(cards[i].join("|||"));
         }
         let cont = lines.join("\n");
-        RNFS.write(props.data.path, cont, 91, 'utf8').catch((err) => {
-          console.error(err.message);
+        RNFS.write(props.data.path, (cont + "\n"), 91, 'utf8').catch((err) => {
+          //console.error(err.message);
         });
   }
 
   function press(button: string) {
-    let score = Number(cards[selected][3]);
+    let score: number = Number(cards[selected][3]);
     if(button == "D") {//Don't Know
       //console.log("Don't Know");
       score -= 1;
@@ -55,13 +55,14 @@ function Study(props: any): JSX.Element {
       score = 1;
     }
 
+    cards[selected][3] = score;
     cards[selected][2] = setDate(score);
 
     let dateSet: any[] = [];
     for(let i=0;i<cards.length;i++) {
       dateSet.push([ cards[i][2], i]);
     }
-    let ordered = dateSet.sort(); //use mergesort
+    let ordered = mergeSort(dateSet);
     //console.log(ordered);
     //console.log(ordered[0][1]);
     SetSel(ordered[0][1]);
@@ -109,7 +110,11 @@ function setDate(score: number) {
   
   let due = new Date(cur.getTime() + (Math.pow(2.2, score) * min));
   //console.log(score, (Math.pow(2.2, score) * min));
-  return due.toISOString();
+  try {
+    return due.toISOString();
+  } catch {
+    return cur.toISOString(); //fix date going over
+  }
 }
 
 const styles = StyleSheet.create({

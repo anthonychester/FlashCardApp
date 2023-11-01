@@ -25,7 +25,7 @@ function Home(props: any): JSX.Element {
       <NavBar />
       <View style={styles.NewCardHolder}>
         <FlashCard
-          front='!["New Set"]("/images/new_set.png") **New Set**'
+          front='**New Set**'
           back=''
           onclick={() => {
             newSet();

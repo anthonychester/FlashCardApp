@@ -31,6 +31,9 @@ function FileNav(props: any) {
         for (let f in result) {
           let res = result[f];
           if (res.isFile() && res.name.indexOf('.mdcs')) {
+            RNFS.read(res.path, res.size).then((str) => {
+              console.log(str);
+            })
             RNFS.read(res.path, 90, 0, 'utf8')
               .then(str => {
                 let file_data = getHeaderData(str);

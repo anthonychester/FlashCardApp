@@ -80,3 +80,37 @@ export function makeMarkdown(text: any): any {
   }
   return out;
 }
+
+function merge(a: any[], b: any[]) {
+  let sorted = [];
+
+  while(a.length && b.length) {
+    if(a[0] < b[0]) {
+      sorted.push(a.shift());
+    } else {
+      sorted.push(b.shift());
+    }
+  }
+
+  return [...sorted, ...a, ...b];
+}
+
+export function mergeSort(arr: any[]): any[] {
+  if(arr.length <= 1) {
+    return arr;
+  }
+
+  let mid = Math.floor(arr.length / 2);
+
+  let a = mergeSort(arr.slice(0, mid));
+  let b = mergeSort(arr.slice(mid));
+
+  return merge(a, b);
+}
+
+export function as_plain(text: string) {
+  let mdi = new mdInterperter((text ? text : ""));
+  mdi.parse();
+
+  return mdi.text.join(" ");
+}

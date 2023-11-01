@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import type {PropsWithChildren} from 'react';
 import {
   Pressable,
@@ -14,14 +14,24 @@ import {
 import RNFS from 'react-native-fs';
 import NavBar from '../NavBar';
 
-import {makeHeaders} from '../common';
+import {as_plain, makeHeaders} from '../common';
+
+let needs_studying = 0;
+let mastery = 0;
 
 function Overview(props: any): JSX.Element {
+  const didMountRef = useRef(false);
   const isDarkMode = useColorScheme() === 'dark';
   //console.log(props.data);
 
   const [cards, setCards] = useState([['']]);
   const [deletePopup, checkDelete] = useState(false);
+
+  useEffect(() => {
+    if (!didMountRef.current) {
+
+    needs_studying = 0;
+    mastery = 0;
 
   RNFS.stat(props.data.path)
     .then(data => {
@@ -29,7 +39,6 @@ function Overview(props: any): JSX.Element {
       RNFS.read(props.data.path, data.size - 90, 90, 'utf8')
         .then(str => {
           if (cards[0] && cards[0][0] == '') {
-            //console.log("str", str);
             //str = "1a|||1b\n2a|||2b\n3a|||3b\n4a|||4b";
             let lines = str.split('\n');
             let cards = [];
@@ -37,7 +46,17 @@ function Overview(props: any): JSX.Element {
               let card = lines[i].split('|||');
             //console.log(str);
               if (card[0] && card[1] && card[3]) {
-                cards.push([card[0].trim(), card[1].trim(), card[2].trim(), card[3].trim()]);
+                if(Number(card[3]) >= 7) {
+                  mastery++;
+                }
+                
+                let due = new Date(card[2]);
+                let cur = new Date();
+                //console.log(due.toISOString() <= cur.toISOString());
+                if(due.toISOString() <= cur.toISOString()) {
+                  needs_studying++;
+                }
+                cards.push([card[0].trim(), card[1].trim(), card[2].trim(), card[3]]);
               }
             }
 
@@ -57,10 +76,15 @@ function Overview(props: any): JSX.Element {
       console.error(err.message);
     });
 
+    didMountRef.current = true;
+    }
+  });
+
   function exit() {
     //console.log("exit");
     props.setScreen('Home', {});
   }
+
   return (
     <View style={styles.screen}>
       <NavBar type="back" title={props.data.name} onExit={exit} />
@@ -71,12 +95,12 @@ function Overview(props: any): JSX.Element {
         path={props.data.path}
         setScreen={props.setScreen}
       />
-      <Info data={props.data} />
+      <Info mastery={mastery} needs_studying={needs_studying} />
       <ScrollView style={styles.main}>
         {(() => {
           let list = [];
           for (let i in cards) {
-            list.push(<Card a={cards[i][0]} b={cards[i][1]} key={i} />);
+            list.push(<Card a={as_plain(cards[i][0])} b={as_plain(cards[i][1])} key={i} />);
           }
           return list;
         })()}
@@ -105,11 +129,11 @@ function Info(props: any): JSX.Element {
   return (
     <View style={styles.info}>
       <Text style={styles.ns}>
-        {props.data.group1 + props.data.group2 + props.data.group3} Need
+        {props.needs_studying} Need
         Studying
       </Text>
       <Text style={{height: '12%'}}>{'\n'}</Text>
-      <Text style={styles.m}>{props.data.group4} Need Mastered</Text>
+      <Text style={styles.m}>{props.mastery} Mastered</Text>
     </View>
   );
 }

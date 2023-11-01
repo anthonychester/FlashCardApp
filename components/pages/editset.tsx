@@ -10,7 +10,7 @@ import {
 import RNFS from 'react-native-fs';
 import NavBar from '../NavBar';
 
-import { makeHeaders } from '../common';
+import { as_plain, makeHeaders } from '../common';
 import EditCard from '../editCard';
 
 
@@ -21,7 +21,7 @@ function EditSet(props: any): JSX.Element {
   RNFS.stat(props.data.path).then((data) => {
   RNFS.read(props.data.path, data.size-90, 90, "utf8").then((str) => {
     if(cards[0] && cards[0][0] == "") {
-        //console.log(str);
+        console.log(str);
         //str = "1a|||1b\n2a|||2b\n3a|||3b\n4a|||4b";
         let lines = str.split("\n");
         let cards = [];
@@ -42,7 +42,7 @@ function EditSet(props: any): JSX.Element {
             }
         }
         setCards(cards);
-        //console.log(cards);
+        console.log(cards);
     }
   }).catch((err) => {
     console.error(err.message);
@@ -83,7 +83,7 @@ function EditSet(props: any): JSX.Element {
         {(() => {
             let list = [];
             for(let i in cards) {
-                list.push(<Card a={cards[i][0]} b={cards[i][1]} key={i} id={i}/>);
+                list.push(<Card a={as_plain(cards[i][0])} b={as_plain(cards[i][1])} key={i} id={i}/>);
             }
             return list;
         })()}

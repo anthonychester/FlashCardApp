@@ -22,7 +22,7 @@ import { mdInterperter } from '../mdinterpreter/main';
 let style: string[][] = [[]];
 let text: string[] = [];
 let temp: string = "";
-
+let temp_styles: string[] = [];
 function EditCard(props: any): JSX.Element {
   const didMountRef = useRef(false);
   const [value, setValue] = useState<any[]>([]);
@@ -71,20 +71,20 @@ function EditCard(props: any): JSX.Element {
       } else {
         text.pop();
         style.pop();
-        style.push([]);
+        style.push(temp_styles);
         text.push(temp);
       }
     }else if(char == " ") { 
       //console.log("blank");
       text.push("");
-      style.push([]);
+      style.push([...temp_styles]);
       temp = "";
     } else {
       temp += char;
       text.pop();
       text.push(temp);
       style.pop();
-      style.push([]);
+      style.push([...temp_styles]);
       
     }
     console.log(text, style);
@@ -126,14 +126,24 @@ function EditCard(props: any): JSX.Element {
             />
             </View>
             <Pressable onPress={() => { 
+              text.push("");
+              style = [[...temp_styles]];
+              temp = "";
+              temp_styles = [];
+              text = [];
+              
               setValue(makeMarkdown(side=="f" ? back : front));
               let mdi = new mdInterperter(side=="f" ? back : front);
               mdi.parse();
               text = mdi.text;
+              if(text[0] == "") {
+                console.log("e");
+                text.splice(0, 1);
+              }
               style = mdi.style;
 
               setSide(side=="f" ? "b" : "f");
-              
+              //console.log("blank");
               }} style={styles.flip}>
             <Image source={require('../assests/flip.png')} style={styles.icon}/>
           </Pressable>
@@ -148,12 +158,12 @@ function EditCard(props: any): JSX.Element {
 function Menu(props: any): JSX.Element {
   return (
     <View style={styles.menu}>
-      <MenuButton name="bold" />
-      <MenuButton name="italics" />
-      <MenuButton name="highlight" />
-      <MenuButton name="image" />
-      <MenuButton name="audio" />
-      <MenuButton name="more" />
+      <MenuButton name="bold" s="b"/>
+      <MenuButton name="italics" s="i"/>
+      <MenuButton name="highlight" s="hl"/>
+      <MenuButton name="image" s="image"/>
+      <MenuButton name="audio" s="audio"/>
+      <MenuButton name="more" s=""/>
     </View>
   );
 }
@@ -162,7 +172,15 @@ function MenuButton(props: any): JSX.Element {
   return (
     <TouchableHighlight
       style={styles.menuButton}
-      onPress={props.onPress}
+      onPress={() => {
+        console.log(temp_styles);
+        if(temp_styles.includes(props.s)) {
+          temp_styles.splice(temp_styles.indexOf(props.s), 1);
+        } else {
+          temp_styles.push(props.s);
+        }
+        console.log(temp_styles);
+      }}
       underlayColor="none">
       <View style={[]}>
         <Text style={styles.menuText}>{props.name}</Text>
